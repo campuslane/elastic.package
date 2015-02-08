@@ -75,6 +75,17 @@ class Elastic  {
 
 
 	/**
+	 * Manage Elasticsearch reporting.
+	 * 
+	 * @return CampusLane\ElasticSearch\Services\Reporting
+	 */
+	public function reporting()
+	{
+		return $this->app['ElasticMapping'];
+	}
+
+
+	/**
 	 * Elasticsearch misc utilities.
 	 *
 	 * @return   CampusLane\ElasticSearch\Services\Utilities

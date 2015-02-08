@@ -5,6 +5,7 @@ use Elasticsearch\Client;
 use CampusLane\ElasticSearch\Services\Indexing;
 use CampusLane\ElasticSearch\Services\Mapping;
 use CampusLane\ElasticSearch\Services\Utilities;
+use CampusLane\ElasticSearch\Services\Reporting;
 
 class ElasticServiceProvider extends ServiceProvider {
 
@@ -38,6 +39,7 @@ class ElasticServiceProvider extends ServiceProvider {
 		$this->registerElasticIndexing();
 		$this->registerElasticMapping();
 		$this->registerElasticUtilities();
+		$this->registerElasticReporting();
 		
 	}
 
@@ -112,6 +114,20 @@ class ElasticServiceProvider extends ServiceProvider {
 
 
 	/**
+	 * Register Elastic Reporting Instance
+	 * 
+	 * @return void
+	 */
+	protected function registerElasticReporting()
+	{
+		$this->app->bindShared('ElasticReporting', function($app)
+		{
+		    	return new Reporting($app['ElasticSearchCient'], $app['ElasticIndexing']);
+		});
+	}
+
+
+	/**
 	 * Get the services provided by the provider.
 	 *
 	 * @return array
@@ -125,6 +141,7 @@ class ElasticServiceProvider extends ServiceProvider {
 			'ElasticIndexing', 
 			'ElasticMapping', 
 			'ElasticUtilities', 
+			'ElasticReporting', 
 		];
 
 	}

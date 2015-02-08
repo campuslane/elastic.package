@@ -104,7 +104,7 @@ class Indexing  {
 	public function createIndex($index)
 	{
 		// append the date to the index name
-		$base = $index . '-' . \Carbon\Carbon::now('America/Vancouver')->toDateString();
+		$base = $index . '-' . \Carbon\Carbon::now(Config::get('app.timezone'))->toDateString();
 
 		// check up to 20 iterations
 		for ($i = 1; $i <= 20; $i++)

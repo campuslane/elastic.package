@@ -16,9 +16,6 @@ use Illuminate\Contracts\Foundation\Application;
  *
  */
 
-
-
-
 class Elastic  {
 
 	/**

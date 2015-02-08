@@ -122,7 +122,7 @@ class ElasticServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('ElasticReporting', function($app)
 		{
-		    	return new Reporting($app['ElasticSearchCient'], $app['ElasticIndexing']);
+		    	return new Reporting($app['ElasticIndexing']);
 		});
 	}
 

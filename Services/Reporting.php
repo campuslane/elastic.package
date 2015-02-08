@@ -17,9 +17,9 @@ class Reporting {
 	 */
 	protected $indexing;
 
-	public function __construct(Client $client, Indexing $indexing)
+	public function __construct(Indexing $indexing)
 	{
-		$this->client = $client;
+		$this->client = $this->getElasticSearchClient();
 		$this->indexing = $indexing;
 	}
 

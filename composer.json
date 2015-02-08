@@ -1,0 +1,21 @@
+{
+    "name": "campuslane/elastic",
+    "description": "",
+    "authors": [
+        {
+            "name": "Frank Matull",
+            "email": "frankm@campuslane.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "5.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "CampusLane\\ElasticSearch\\": ""
+        }
+    },
+
+    "minimum-stability": "stable"
+}

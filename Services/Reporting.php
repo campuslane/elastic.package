@@ -25,7 +25,7 @@ class Reporting {
 
 
 	/**
-	 * Get Indices Information
+	 * Get indexes Information
 	 * Elasticsearch gives us the indices information in a single 
 	 * string with line breaks.  We have to convert this into an array 
 	 * of information. 
@@ -33,18 +33,18 @@ class Reporting {
 	 * @param  string $alias
 	 * @return array   Includes indices, header, and aliasedIndex
 	 */
-	public function getIndicesInfo($alias)
+	public function getIndexesInfo($alias)
 	{
 		$output = [];
 		
 		// get indices with headers
-		$indices = $this->client->cat()->indices(['v'=>true]);
+		$indexes = $this->client->cat()->indices(['v'=>true]);
 		
 		// convert elasticsearch string into an array of data
-		$indices = str_replace("\n", ' ', $indices);
-		$indices = preg_split('/\s+/', $indices);
-		$indices = array_filter($indices, 'strlen');
-		$indices = array_chunk($indices, 9);
+		$indexes = str_replace("\n", ' ', $indexes);
+		$indexes = preg_split('/\s+/', $indexes);
+		$indexes = array_filter($indexes, 'strlen');
+		$indexes = array_chunk($indexes, 9);
 
 		// array to map the headers 
 		$headerMap = [
@@ -60,22 +60,22 @@ class Reporting {
 		];
 
 		// assign associate array keys using header map
-		foreach($indices as $key => $index) 
+		foreach($indexes as $key => $index) 
 		{
 			foreach($index as $k => $value)
 			{
-				unset($indices[$key][$k]);
-				$indices[$key][$headerMap[$k]] = $value;
+				unset($indexes[$key][$k]);
+				$indexes[$key][$headerMap[$k]] = $value;
 			}
 		}
 
 		// put the indexes in a collection and sort by name
-		$indices = new Collection($indices);
-		$indices = $indices->sortBy(function($index){return $index['index'];});
+		$indexes = new Collection($indexes);
+		$indexes = $indexes->sortBy(function($index){return $index['index'];});
 
 		// set the header row & remove it from indexes
-		$header = isset($indices[0]) ? $indices[0] : '';
-		if ($header) unset($indices[0]);
+		$header = isset($indexes[0]) ? $indexes[0] : '';
+		if ($header) unset($indexes[0]);
 
 		// get the alias
 		$alias = $this->client->indices()->getAlias(['name'=>$alias]);
@@ -90,7 +90,7 @@ class Reporting {
 		// set up and return output
 		$output['header'] = $header;
 		$output['aliasedIndex'] = $aliasedIndex;
-		$output['indexes'] = $indices;
+		$output['indexes'] = $indexes;
 
 		return $output;
 	}

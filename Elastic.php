@@ -79,9 +79,9 @@ class Elastic  {
 	 * @param  string $index
 	 * @return array
 	 */
-	public function indexReportData($index = '')
+	public function indexesReportData($indexName = '')
 	{
-		return $this->index->reportData($index);
+		return $this->index->reportData($indexName);
 	}
 
 

@@ -2,10 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 use Elasticsearch\Client;
-use CampusLane\ElasticSearch\Services\Indexing;
-use CampusLane\ElasticSearch\Services\Mapping;
-use CampusLane\ElasticSearch\Services\Utilities;
-use CampusLane\ElasticSearch\Services\Reporting;
+use CampusLane\ElasticSearch\Services\Index;
+
 
 class ElasticServiceProvider extends ServiceProvider {
 
@@ -33,18 +31,13 @@ class ElasticServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-		
 		$this->registerElasticSearchClient();
 		$this->registerElastic();
-		$this->registerElasticIndexing();
-		$this->registerElasticMapping();
-		$this->registerElasticUtilities();
-		$this->registerElasticReporting();
-		
+		$this->registerElasticIndex();	
 	}
 
 	/**
-	 * Register Elasticsearch client (official php client from Elasticsearch)
+	 * Register the official Elasticsearch PHP Client instance.
 	 * 		
 	 * @return void
 	 */
@@ -58,7 +51,7 @@ class ElasticServiceProvider extends ServiceProvider {
 	}
 
 	/**
-	 * Register Elastic Instance
+	 * Register our wrapper Elastic instance
 	 *
 	 * @return void
 	 */
@@ -66,63 +59,21 @@ class ElasticServiceProvider extends ServiceProvider {
 	{
 		$this->app->bindShared('Elastic', function($app)
 		{
-		    	return new Elastic($app);
+		    	return new Elastic($app, $app['ElasticIndex']);
 		});
 	}
 
 
 	/**
-	 * Register Elastic Indexing Instance
+	 * Register index instance
 	 * 
 	 * @return void
 	 */
-	protected function registerElasticIndexing()
+	protected function registerElasticIndex()
 	{
-		$this->app->bindShared('ElasticIndexing', function($app)
+		$this->app->bindShared('ElasticIndex', function($app)
 		{
-		    	return new Indexing();
-		});
-	}
-
-
-	/**
-	 * Register Elastic Mapping Instance
-	 * 
-	 * @return void
-	 */
-	protected function registerElasticMapping()
-	{
-		$this->app->bindShared('ElasticMapping', function($app)
-		{
-		    	return new Mapping();
-		});
-	}
-
-
-	/**
-	 * Register Elastic Utilities Instance
-	 * 
-	 * @return void
-	 */
-	protected function registerElasticUtilities()
-	{
-		$this->app->bindShared('ElasticUtilities', function($app)
-		{
-		    	return new Utilities();
-		});
-	}
-
-
-	/**
-	 * Register Elastic Reporting Instance
-	 * 
-	 * @return void
-	 */
-	protected function registerElasticReporting()
-	{
-		$this->app->bindShared('ElasticReporting', function($app)
-		{
-		    	return new Reporting($app['ElasticIndexing']);
+		    	return new Index($app['ElasticSearchClient']);
 		});
 	}
 
@@ -138,10 +89,8 @@ class ElasticServiceProvider extends ServiceProvider {
 
 			'Elastic', 
 			'ElasticSearchClient', 
-			'ElasticIndexing', 
-			'ElasticMapping', 
-			'ElasticUtilities', 
-			'ElasticReporting', 
+			'ElasticIndex', 
+		
 		];
 
 	}

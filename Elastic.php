@@ -1,28 +1,19 @@
 <?php namespace CampusLane\ElasticSearch;
 
-use CampusLane\ElasticSearch\Services\ClientTrait;
-use CampusLane\ElasticSearch\Services\Indexing;
-use CampusLane\ElasticSearch\Services\Mapping;
-use CampusLane\ElasticSearch\Services\Utilities;
+use CampusLane\ElasticSearch\Services\Index;
 use Illuminate\Contracts\Foundation\Application;
+use Elasticsearch\Client;
 
 
 /**
  * Elastic
  * 
- * A single entry point for managing Elasticsearch.
- * It includes direct access to the official Elasticsearch\Client class 
- * and to other classes that enhance the client's functionalty.
+ * A single entry point for managing Elasticsearch.  Provides 
+ * a wrapper for the official Elasticsearch PHP Client.
  *
  */
 
 class Elastic  {
-
-	/**
-	 * Provide access to ElasticSearch\Client.
-	 */
-	use ClientTrait;
-
 
 	/**
 	 * The Laravel application instance.
@@ -31,68 +22,66 @@ class Elastic  {
 	 */
 	protected $app;
 
+	/**
+	 * Indexing instance
+	 * @var CampusLane\ElasticSearch\Services\Indexing
+	 */
+	protected $index;
+
 
 	/**
 	 * Injects the laravel application instance.
 	 */
-	public function __construct(Application $app)
+	public function __construct(Application $app, Index $index)
 	{
 		$this->app = $app;	
+		$this->index = $index;
 	}
 
-
 	/**
-	 * Get the Elasticsearch official PHP client.
+	 * The official elasticsearch php client
 	 * 
-	 * @return Elasticsearch\Client instance
+	 * @return instance of Elasticsearch\Client
 	 */
 	public function client()
 	{
-		return $this->getElasticSearchClient();
+		return new Client();
 	}
 
 
 	/**
-	 * Manage Elasticsearch indexes/Indexing.
+	 * Check if an index exists.
 	 * 
-	 * @return CampusLane\ElasticSearch\Services\Indexing
+	 * @param  string $name
+	 * @return array
 	 */
-	public function indexing()
+	public function indexExists($name)
 	{
-		return $this->app['ElasticIndexing'];
+		return $this->index->exists($name);
 	}
 
 
 	/**
-	 * Manage Elasticsearch mapping.
+	 * Drop an index.
 	 * 
-	 * @return CampusLane\ElasticSearch\Services\Mapping
+	 * @param  string $name
+	 * @return array
 	 */
-	public function mapping()
+	public function indexDrop($name)
 	{
-		return $this->app['ElasticMapping'];
+		return $this->index->drop($name);
 	}
 
 
 	/**
-	 * Manage Elasticsearch reporting.
+	 * Get data about all indexes or specify a specific one.
 	 * 
-	 * @return CampusLane\ElasticSearch\Services\Reporting
+	 * @param  string $index
+	 * @return array
 	 */
-	public function reporting()
+	public function indexReportData($index = '')
 	{
-		return $this->app['ElasticMapping'];
-	}
-
-
-	/**
-	 * Elasticsearch misc utilities.
-	 *
-	 * @return   CampusLane\ElasticSearch\Services\Utilities
-	 */
-	public function utilities()
-	{
-		return $this->app['ElasticUtilities'];
+		return $this->index->reportData($index);
 	}
 
 

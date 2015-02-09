@@ -23,8 +23,8 @@ class Elastic  {
 	protected $app;
 
 	/**
-	 * Indexing instance
-	 * @var CampusLane\ElasticSearch\Services\Indexing
+	 * Index instance
+	 * @var CampusLane\ElasticSearch\Services\Index
 	 */
 	protected $index;
 

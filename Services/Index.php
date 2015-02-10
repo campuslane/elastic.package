@@ -10,7 +10,7 @@ class Index  {
 	 * The official elasticsearch php client
 	 * @var Elasticsearch\Client
 	 */
-	public $client;
+	protected $client;
 
 
 	/**
@@ -42,7 +42,7 @@ class Index  {
 	 * @param string $indexName
 	 * @return  array
 	 */
-	public function createIndex($indexName) 
+	public function add($indexName) 
 	{
 		if ( $this->exists($indexName) ) 
 		{
@@ -109,10 +109,19 @@ class Index  {
 			}
 		}
 
+		$indexes = Collection::make($indexes);
+
+		$indexes = $indexes->SortBy('settings.creation_date');
+
 		return $indexes;
 	}
 
 
+	/**
+	 * Sing Index Data
+	 * @param  string $indexName
+	 * @return array
+	 */
 	public function singleIndexData($indexName)
 	{
 		$output = [];
@@ -124,8 +133,34 @@ class Index  {
 			'aliases' => $this->getIndexAliases($indexName), 
 		]; 
 
-		return  $output + $this->formatStats($indexName);
+		return  $output + $this->formatStats($indexName) + $this->formatSettings($indexName);
 
+	}
+
+
+	/**
+	 * Aliases data.
+	 * 
+	 * @return array
+	 */
+	public function aliasesData()
+	{
+		$output = [];
+
+		$indexes = $this->client->indices()->getAliases();
+
+		foreach ($indexes as $indexName =>$index) 
+		{
+			if ( isset($index['aliases']) and is_array($index['aliases']) )
+			{
+				foreach( $index['aliases'] as $alias => $values)
+				{
+					$output[] = ['name' => $alias, 'index' => $indexName];
+				}
+			}
+		}
+
+		return $output;
 	}
 
 
@@ -168,6 +203,40 @@ class Index  {
 
 
 	/**
+	 * Get settings.
+	 * 
+	 * @param  string $indexName
+	 * @return array
+	 */
+	public function getSettings($indexName)
+	{
+		$settings =   $this->client->indices()->getSettings(['index'=>$indexName]);
+
+		$settings[$indexName]['settings']['index']['creation_date'] = substr($settings[$indexName]['settings']['index']['creation_date'], 0, -3);
+
+		return $settings;
+		
+
+	}
+
+
+	/**
+	 * Format settings.
+	 * 
+	 * @param  array $settings
+	 * @return array
+	 */
+	public function formatSettings($indexName)
+	{
+		$output = [];
+		$settings = $this->getSettings($indexName);
+		$output['settings'] =  isset($settings[$indexName]['settings']['index']) ? $settings[$indexName]['settings']['index'] : [];
+		return $output;
+	}
+	
+
+
+	/**
 	 * Get the Index Aliases.
 	 * 
 	 * @param  string $indexName
@@ -195,6 +264,81 @@ class Index  {
 
 
 	/**
+	 * Drop alias
+	 * @param  string $alias
+	 * @param  string $index
+	 * @return array
+	 */
+	public function deleteAlias($alias, $index)
+	{
+		$params = ['name'=>$alias, 'index'=>$index];
+
+		return $this->client->indices()->deleteAlias($params);
+	}
+
+
+	/**
+	 * Active index
+	 * Find the active index based on the active index alias.
+	 * 
+	 * @param  string $activeIndexAlias
+	 * @return string  (active index name)
+	 */
+	public function activeIndex($activeIndexAlias)
+	{
+		$indexes = $this->client->indices()->getAliases();
+
+
+
+		foreach( $indexes as $index => $aliases )
+		{
+			if ( $aliases ) 
+			{
+				foreach( $aliases['aliases'] as $alias => $value )
+				{
+					if ($alias == $activeIndexAlias)
+					{	
+						return $index;
+					}
+				}
+			}
+		}
+
+		return '';
+	}
+
+
+	/**
+	 * Activate index
+	 * 
+	 * @param  string $currentIndex   
+	 * @param  string $newIndex        
+	 * @param  string $activeIndexAlias 
+	 * @return array              
+	 */
+	public function activateIndex($currentIndex, $newIndex, $activeIndexAlias)
+	{
+		// delete alias from current index if it's there
+		$params = ['name'=>$activeIndexAlias, 'index'=>$currentIndex];
+
+		if ( $this->client->indices()->existsAlias($params) )
+		{
+			$this->client->indices()->deleteAlias($params);
+		}
+
+		// add alias to new index if it's not there yet
+		$params = ['name'=>$activeIndexAlias, 'index'=>$newIndex];
+
+		if ( ! $this->client->indices()->existsAlias($params) )
+		{
+			$this->client->indices()->putAlias($params);
+		}
+
+		return ['done'];
+	}
+
+
+	/**
 	 * Format bytes into megabytes.
 	 * 
 	 * @param  integer  $size    (bytes)
@@ -204,9 +348,9 @@ class Index  {
 	protected function formatBytes($size, $precision = 2)
 	{
 		$base = log($size, 1024);
-		$suffixes = array('', 'k', 'M', 'G', 'T');   
+		$suffixes = array('bytes', 'kb', 'Mb', 'G', 'T');   
 
-		return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+		return round(pow(1024, $base - floor($base)), $precision) . ' ' . $suffixes[floor($base)];
 	}
 
 }

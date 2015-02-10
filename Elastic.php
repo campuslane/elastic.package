@@ -26,7 +26,7 @@ class Elastic  {
 	 * Index instance
 	 * @var CampusLane\ElasticSearch\Services\Index
 	 */
-	protected $index;
+	public $index;
 
 
 	/**
@@ -82,6 +82,55 @@ class Elastic  {
 	public function indexesReportData($indexName = '')
 	{
 		return $this->index->reportData($indexName);
+	}
+
+
+	/**
+	 * Get aliases data
+	 * @return array
+	 */
+	public function aliasesData()
+	{
+		return $this->index->aliasesData();
+	}
+
+
+	/**
+	 * Drop alias.
+	 * 
+	 * @param  string $alias
+	 * @param  string $index
+	 * @return array
+	 */
+	public function deleteAlias($alias, $index)
+	{
+		return $this->index->deleteAlias($alias, $index);
+	}
+
+
+	/**
+	 * Active Index
+	 * 
+	 * @param  string $activeIndexAlias
+	 * @return string
+	 */
+	public function activeIndex($activeIndexAlias)
+	{
+		return $this->index->activeIndex($activeIndexAlias);
+	}
+
+
+	/**
+	 * Activate Index
+	 * 
+	 * @param  string $currentIndex
+	 * @param  string $newIndex
+	 * @param  string $activeIndexAlias
+	 * @return array          
+	 */
+	public function activateIndex($currentIndex, $newIndex, $activeIndexAlias)
+	{
+		return $this->index->activateIndex($currentIndex, $newIndex, $activeIndexAlias);
 	}
 
 

@@ -21,7 +21,9 @@ class ElasticServiceProvider extends ServiceProvider {
 	 */
 	public function boot()
 	{
-		// nothing to boot
+		$this->setControllerRoute();
+		$this->setViewsDirectory();
+		$this->setConfigAndAssetPublishing();
 	}
 
 	/**
@@ -34,6 +36,37 @@ class ElasticServiceProvider extends ServiceProvider {
 		$this->registerElasticSearchClient();
 		$this->registerElastic();
 		$this->registerElasticIndex();	
+	}
+
+
+	/**
+	 * Set the controller route
+	 */
+	public function setControllerRoute()
+	{
+		\Route::controller(config('elastic.route'), 'CampusLane\ElasticSearch\Controllers\ElasticController');
+	}
+
+
+	/**
+	 * Set the view directory for package
+	 */
+	public function setViewsDirectory()
+	{
+		$this->loadViewsFrom(__DIR__.'/Views', 'elastic');
+	}
+
+
+	/**
+	 * Set config and asset publishing
+	 */
+	public function setConfigAndAssetPublishing()
+	{
+		$this->publishes([
+    			__DIR__.'/Config/elastic.php' => config_path('elastic.php'),
+    			__DIR__.'/Assets/js/elastic.js' => public_path('js/elastic/elastic.js'),
+    			__DIR__.'/Assets/css/elastic.css' => public_path('css/elastic/elastic.css'),
+		]);
 	}
 
 	/**

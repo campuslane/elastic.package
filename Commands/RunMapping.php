@@ -1,6 +1,7 @@
 <?php namespace CampusLane\ElasticSearch\Commands;
 
 use Illuminate\Contracts\Bus\SelfHandling;
+use App;
 
 
 /**
@@ -8,6 +9,30 @@ use Illuminate\Contracts\Bus\SelfHandling;
  */
 
 class RunMapping implements SelfHandling {
+
+
+	/**
+	 * Index name for mapping
+	 * @var string
+	 */
+	protected $index;
+
+	/**
+	 * Type name for mapping
+	 * @var [type]
+	 */
+	protected $type;
+
+
+	/**
+	 * Constructor
+	 * @param string $index (the index to map)
+	 */
+	public function __construct($index, $type)
+	{
+		$this->index = $index;
+		$this->type = $type;
+	}
 
 	/**
 	 * Execute the command.
@@ -20,8 +45,9 @@ class RunMapping implements SelfHandling {
 		$mappingClass = config('elastic.mapping.class');
 
 		// instantiate the class and run the method
-		$mapping = new $mappingClass();
-		return $mapping->handle();
+		$mapping = new $mappingClass(App::make('Elastic'), $this->index);
+		
+		return $mapping->handle($this->type);
 	}
 
 }

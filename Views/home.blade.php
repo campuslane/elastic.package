@@ -54,8 +54,8 @@
 
 				<td data-index-name="{{$index['name']}}">	
 					
-
-					<a class="start-indexing"  href="#">Set</a>  
+					<a href="/{{config('elastic.route')}}/index-info/{{$index['name']}}">Manage Index</a>
+					<!-- <a class="start-indexing"  href="#">Set</a>  
 					<i style="display:none" class="fa fa-spinner fa-spin index-spinner"></i>  |
 
 					<a class="map-index"  href="#">Map</a>  
@@ -68,7 +68,7 @@
 					<i style="display:none" class="fa fa-spinner fa-spin drop-spinner"></i>  | 
 
 					<a class="drop-index"  href="#">Drop</a>  
-					<i style="display:none" class="fa fa-spinner fa-spin drop-spinner"></i>  
+					<i style="display:none" class="fa fa-spinner fa-spin drop-spinner"></i>   -->
 
 					
 				</td>
@@ -138,6 +138,26 @@ $(document).ready(function() {
 
 	});
 
+	$(document).on('click', '.map-index', function(e){
+
+		alert('dude');
+
+		e.preventDefault();
+
+		var index = $(this).parent().attr('data-index-name');
+
+		$.ajax({
+			type: 'post', 
+			url: '/{{config("elastic.route")}}/map', 
+			data: {index:index, _token: '{{Session::token()}}'},
+			dataType: 'json',
+			success: function(response) {
+				console.log(response);
+			}
+		})
+
+	});
+
 	$(document).on('click', '.drop-alias', function(e){
 
 		e.preventDefault();
@@ -147,7 +167,7 @@ $(document).ready(function() {
 
 		$.ajax({
 			type: 'post', 
-			url: '/es/delete-alias', 
+			url: '/{{config("elastic.route")}}/delete-alias', 
 			data: {alias:alias, index:index, _token: '{{Session::token()}}'}, 
 			dataType: 'json', 
 			success: function(response) {
@@ -172,7 +192,7 @@ $(document).ready(function() {
 
 		$.ajax({
 			type: 'post', 
-			url: '/es/drop-index', 
+			url: '/{{config("elastic.route")}}/drop-index', 
 			data: {index:index, _token: '{{Session::token()}}'}, 
 			success: function(response) {
 				window.location.href = '/{{config("elastic.route")}}';
@@ -196,7 +216,7 @@ $(document).ready(function() {
 
 		$.ajax({
 			type: 'post', 
-			url: '/es/add-index', 
+			url: '/{{config("elastic.route")}}/add-index', 
 			data: {index:index, _token: '{{Session::token()}}'}, 
 			dataType: 'json', 
 			success: function(response) {
@@ -222,7 +242,7 @@ $(document).ready(function() {
 
 		$.ajax({
 			type: 'post', 
-			url: '/es/activate-index', 
+			url: '/{{config("elastic.route")}}/activate-index', 
 			data: {current_index:current_index, new_index:new_index, _token: '{{Session::token()}}'}, 
 			dataType: 'json', 
 			success: function(response) {

@@ -190,6 +190,50 @@ class Index  {
 
 
 	/**
+	 *  Get Index docs count
+	 * 
+	 * @param  string $index
+	 * @return array   (with docs)
+	 */
+	public function getIndexDocsCount($index)
+	{
+		$output = [];
+
+		$stats = $this->getStats($index);
+
+		if ( isset($stats['indices'][$index]['primaries']['docs']['count']) )
+		{
+			return $output['docs'] = $stats['indices'][$index]['primaries']['docs']['count'];	
+		}
+
+		return $output['docs'] = "Couldn't retrieve Docs Count";
+
+	}
+
+
+	/**
+	 *  Get index types
+	 * 
+	 * @param  string $index
+	 * @return array   (with types)
+	 */
+	public function getIndexTypes($index)
+	{
+		$types = '';
+
+		$indexData = $this->client->indices()->get(['index'=>$index]);
+
+		foreach ($indexData[$index]['mappings'] as $type => $mapping)
+		{
+			$types .= $type . ', ';
+		}
+
+		return trim($types, ', ');
+
+	}
+
+
+	/**
 	 * Get index stats.
 	 * 
 	 * @param  string $indexName 
@@ -239,15 +283,16 @@ class Index  {
 	/**
 	 * Get the Index Aliases.
 	 * 
-	 * @param  string $indexName
+	 * @param  string $index
 	 * @return string  comma separated list of alias names
 	 */
-	public function getIndexAliases($indexName)
+	public function getIndexAliases($index)
 	{
-		$params['index'] = $indexName;
+
+		$params['index'] = $index;
 		$response = $this->client->indices()->getAliases($params);
 
-		if( $aliases = isset($response[$indexName]['aliases']) ? $response[$indexName]['aliases'] : false ) 
+		if( $aliases = isset($response[$index]['aliases']) ? $response[$index]['aliases'] : [] ) 
 		{
 			$output = '';
 
@@ -260,6 +305,30 @@ class Index  {
 		}
 
 		return '';
+	}
+
+
+	/**
+	 * Get index creation date
+	 * @param  string $index
+	 * @return string 
+	 */
+	public function getIndexCreationDate($index) 
+	{
+
+		$indexData = $this->client->indices()->get(['index'=> $index]);
+
+		if (isset($indexData[$index]['settings']['index']['creation_date']))
+		{
+			$timestamp = $indexData[$index]['settings']['index']['creation_date'];
+
+			$timestamp = $this->trimTimestamp($timestamp, 3);
+
+			return \Carbon\Carbon::createFromTimeStamp($timestamp)->toDateTimeString();
+			
+		}
+
+		return "Couldn't retrieve creation date";
 	}
 
 
@@ -353,4 +422,17 @@ class Index  {
 		return round(pow(1024, $base - floor($base)), $precision) . ' ' . $suffixes[floor($base)];
 	}
 
+
+	/**
+	 * Trim timestamp
+	 * We need to trim 3 chars off  the elasticsearch timestamp.
+	 *  
+	 * @param  integer  $timestamp
+	 * @param  integer $chars
+	 * @return integer 
+	 */
+	protected function trimTimestamp($timestamp, $chars = 3)
+	{
+		return substr($timestamp, 0, -$chars);
+	}
 }

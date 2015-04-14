@@ -1,7 +1,7 @@
 <?php namespace CampusLane\ElasticSearch\Commands;
 
 use Illuminate\Contracts\Bus\SelfHandling;
-
+use App;
 
 /**
  * Update Settings
@@ -20,7 +20,7 @@ class UpdateSettings implements SelfHandling {
 		$settingsClass = config('elastic.settings.class');
 		
 		// instantiate the class and run the method
-		$settings = new $settingsClass();
+		$settings = new $settingsClass( App::make('Elastic') );
 		return $settings->handle();
 	}
 

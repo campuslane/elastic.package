@@ -133,5 +133,53 @@ class Elastic  {
 		return $this->index->activateIndex($currentIndex, $newIndex, $activeIndexAlias);
 	}
 
+	/**
+	 *  Get Index docs count
+	 * 
+	 * @param  string $index
+	 * @return array   (with docs)
+	 */
+	public function getIndexDocsCount($index)
+	{
+		return $this->index->getIndexDocsCount($index);
+	}
+
+
+	/**
+	 *  Get index types
+	 * 
+	 * @param  string $index
+	 * @return array   (with types)
+	 */
+	public function getIndexTypes($index)
+	{
+		return $this->index->getIndexTypes($index);
+
+	}
+
+
+	/**
+	 * Get the Index Aliases.
+	 * 
+	 * @param  string $index
+	 * @return string  comma separated list of alias names
+	 */
+	public function getIndexAliases($index)
+	{
+		return $this->index->getIndexAliases($index);
+	}
+
+
+	/**
+	 * Get index creation date.
+	 * 
+	 * @param  string $index 
+	 * @return string  
+	 */
+	public function getIndexCreationDate($index) 
+	{
+		return $this->index->getIndexCreationDate($index);
+	}
+
 
 }

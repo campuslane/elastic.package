@@ -7,7 +7,7 @@
 	<title>@yield('page_title')</title>
 
 	{!! Html::style('css/elastic/elastic.css') !!}
-	
+
 </head>
 
 <body>
@@ -28,9 +28,9 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-      
-     
-        
+
+
+
 
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -43,7 +43,10 @@
  	</div>
 
 	{!! Html::script('js/elastic/elastic.js') !!}
-	
+
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+
       @yield('scripts');
 
 

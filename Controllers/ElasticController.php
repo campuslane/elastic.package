@@ -48,8 +48,6 @@ class ElasticController extends BaseController
         $indexes =  Bus::dispatch(new GetIndexesData());
         $activeIndex = Bus::dispatch(new GetActiveIndex(config('elastic.index.alias')));
 
-        return 'chicken';
-
         return view('elastic::home', compact('indexes', 'activeIndex'));
     }
 
